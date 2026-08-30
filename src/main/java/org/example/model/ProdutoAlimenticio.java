@@ -1,8 +1,8 @@
-package org.example;
+package org.example.model;
 
 import java.time.LocalDate;
 
-public class ProdutoAlimenticio extends Produto{
+public class ProdutoAlimenticio extends Produto {
 
     private LocalDate dataValidade;
 
@@ -13,5 +13,11 @@ public class ProdutoAlimenticio extends Produto{
 
     public LocalDate getDataValidade() {
         return dataValidade;
+    }
+
+    @Override
+    public String  toString() {
+        return super.toString() +
+                " | Data de validade: " + dataValidade;
     }
 }
