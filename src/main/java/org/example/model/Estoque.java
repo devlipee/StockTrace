@@ -1,5 +1,6 @@
 package org.example.model;
 
+import org.example.exception.EstoqueInsuficienteException;
 import org.example.exception.ProdutoDuplicadoException;
 import org.example.exception.ProdutoNaoEncontradoException;
 
@@ -8,9 +9,11 @@ import java.util.ArrayList;
 public class Estoque {
 
     private ArrayList<ItemEstoque> itens;
+    private  ArrayList<Movimentacao> historico;
 
     public Estoque() {
         this.itens = new ArrayList<>();
+        this.historico = new ArrayList<>();
     }
 
     public void cadastrarProduto(Produto produto){
@@ -34,11 +37,17 @@ public class Estoque {
     public void adicionarEstoque(int idProduto, int quantidade){
         ItemEstoque item = buscarItemPorId(idProduto);
         item.adicionarEstoque(quantidade);
+        Movimentacao mov = new Movimentacao(item.getProduto(), quantidade, TipoMovimentacao.ENTRADA);
+        historico.add(mov);
+
     }
 
     public void retiraEstoque(int idProduto, int quantidade){
         ItemEstoque item = buscarItemPorId(idProduto);
         item.retiraEstoque(quantidade);
+        Movimentacao mov = new Movimentacao(item.getProduto(), quantidade, TipoMovimentacao.SAIDA);
+        historico.add(mov);
+
     }
 
     public int consultarQuantidade(int idProduto){
@@ -49,6 +58,12 @@ public class Estoque {
         for (ItemEstoque item : itens){
             System.out.println(item.getProduto()+ " | Quantidade: "+ item.getQuantidade());;
         }
+    }
+    public void listarMovimentacoes(){
+        for (Movimentacao mov : historico){
+            System.out.println(mov);
+        }
+
     }
 
     public ItemEstoque buscarItemPorNome(String nome) {

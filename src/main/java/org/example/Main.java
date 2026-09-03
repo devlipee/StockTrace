@@ -39,6 +39,10 @@ public class Main {
 
         ItemEstoque encontrado = estoque.buscarItemPorNome("biscoito de polvilho");
         System.out.println(encontrado.getProduto() + " | Quantidade: " + encontrado.getQuantidade());
+        System.out.println("--- Histórico de movimentações ---");
+        estoque.retiraEstoque(1,1);
+        estoque.listarMovimentacoes();
+
 
     }
 }
