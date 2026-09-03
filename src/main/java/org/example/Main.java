@@ -6,43 +6,34 @@ import org.example.model.ProdutoEletronico;
 import org.example.model.ItemEstoque;
 
 import java.time.LocalDate;
+import java.util.Scanner;
 
 
 public class Main {
     public static void main(String[] args) {
 
-        // ⚠️ Código temporário de teste manual da Fase 1 (Java + POO).
-        // Serve só pra validar Produto, ProdutoAlimenticio, ProdutoEletronico,
-        // Estoque e as exceptions enquanto o projeto ainda está em memória.
-        // Será substituído por testes de verdade (JUnit) e por um menu real mais pra frente.
-
-        ProdutoAlimenticio pa = new ProdutoAlimenticio(1,10,"Biscoito de polvilho", LocalDate.of(2027,12,30));
-        ProdutoEletronico pe = new ProdutoEletronico(2,1500.00,"Notebook",12);
-
+        //cria scaner e inicia estoque
+        Scanner scanner = new Scanner(System.in);
         Estoque estoque = new Estoque();
-        estoque.cadastrarProduto(pa);
-        estoque.cadastrarProduto(pe);
+        int opcao = -1;
 
-        estoque.adicionarEstoque(pa.getId(), 10);
-        System.out.println(estoque.consultarQuantidade(pa.getId()));
+        while (opcao != 0){
+            System.out.println("1 - Cadastrar produto");
+            System.out.println("2 - Listar produtos    ");
+            System.out.println("3 - Adicionar estoque");
+            System.out.println("4 - Retirar estoque");
+            System.out.println("5 - Buscar produto por nome ");
+            System.out.println("6 - Ver histórico de movimentações");
+            System.out.println("0 - Sair");
 
-        estoque.adicionarEstoque(pe.getId(), 20);
-        System.out.println(estoque.consultarQuantidade(pe.getId()));
+            opcao = scanner.nextInt();
 
-        try{
-            estoque.retiraEstoque(pe.getId(), 30);
-        } catch (EstoqueInsuficienteException e){
-            System.out.println("ERRO: "+ e.getMessage());
+            switch (opcao){
+                case 1:
+
+            }
+
         }
-        System.out.println("--- Lista de produtos ---");
-        estoque.listarProdutos();
-
-        ItemEstoque encontrado = estoque.buscarItemPorNome("biscoito de polvilho");
-        System.out.println(encontrado.getProduto() + " | Quantidade: " + encontrado.getQuantidade());
-        System.out.println("--- Histórico de movimentações ---");
-        estoque.retiraEstoque(1,1);
-        estoque.listarMovimentacoes();
-
 
     }
 }

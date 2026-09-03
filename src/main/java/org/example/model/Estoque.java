@@ -1,8 +1,8 @@
 package org.example.model;
 
-import org.example.exception.EstoqueInsuficienteException;
-import org.example.exception.ProdutoDuplicadoException;
+
 import org.example.exception.ProdutoNaoEncontradoException;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 
@@ -10,20 +10,26 @@ public class Estoque {
 
     private ArrayList<ItemEstoque> itens;
     private  ArrayList<Movimentacao> historico;
+    private int proximoId;
 
     public Estoque() {
         this.itens = new ArrayList<>();
         this.historico = new ArrayList<>();
+        this.proximoId = 1;
     }
 
-    public void cadastrarProduto(Produto produto){
-        for (ItemEstoque item : itens){
-            if (item.getProduto().getId() == produto.getId()){
-                throw new ProdutoDuplicadoException("ERRO: Produto cadastrado com ID igual há outro produto existente!");
-            }
-        }
+    public void cadastrarProdutoAlimenticio(String nome, double preco, LocalDate dataValidade){
+        ProdutoAlimenticio produto = new ProdutoAlimenticio(proximoId, preco, nome, dataValidade);
         itens.add(new ItemEstoque(produto));
+        proximoId++;
     }
+
+    public void cadastrarProdutoEletronico(String nome, double preco, int mesesGarantia){
+        ProdutoEletronico produto = new ProdutoEletronico(proximoId, preco, nome, mesesGarantia);
+        itens.add(new ItemEstoque(produto));
+        proximoId++;
+    }
+
 
     public ItemEstoque buscarItemPorId(int id){
         for (ItemEstoque item : itens){
