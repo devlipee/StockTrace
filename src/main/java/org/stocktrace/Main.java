@@ -1,17 +1,56 @@
 package org.stocktrace;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import org.stocktrace.model.*;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
-        }
+import java.math.BigDecimal;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Categoria categoria = new Categoria(
+                "Alimentos",
+                "Produtos alimentícios"
+        );
+
+        Produto arroz = new Produto(
+                "ARR001",
+                "Arroz 5kg",
+                "Arroz branco tipo 1",
+                new BigDecimal("29.90"),
+                "UN",
+                categoria
+        );
+
+        Localizacao deposito = new Localizacao(
+                "Depósito",
+                "Área principal"
+        );
+
+        Usuario usuario = new Usuario(
+                "Samuel",
+                "luiz"
+        );
+
+        Estoque estoque = new Estoque(
+                arroz,
+                deposito
+        );
+
+        estoque.adicionar(50);
+
+        Movimentacao entrada = new Movimentacao(
+                estoque,
+                TipoMovimentacao.ENTRADA,
+                50,
+                "Compra de fornecedor",
+                "Estoque inicial",
+                usuario
+        );
+
+        System.out.println("Produto: " + arroz.getNome());
+        System.out.println("Localização: " + deposito.getNome());
+        System.out.println("Quantidade: " + estoque.getQuantidadeAtual());
+        System.out.println(entrada.getDescricao());
     }
 }
