@@ -2,32 +2,25 @@ package org.stocktrace.model;
 
 public class Usuario {
 
+    private Long id;
     private String nome;
-    private String login;
-    private boolean ativo;
 
-    public Usuario(String nome, String login) {
+    // Usuário novo
+    public Usuario(String nome) {
         this.nome = nome;
-        this.login = login;
-        this.ativo = true;
     }
 
-    public String getNome() {return nome;}
-    public String getLogin() {return login;}
-    public boolean isAtivo() {return ativo;}
-
-
-    //METODOS
-    public void atualizarDados(String nome, String login) {
+    // Usuário que já veio do banco
+    public Usuario(Long id, String nome) {
+        this.id = id;
         this.nome = nome;
-        this.login = login;
     }
 
-    public void ativar() {
-        this.ativo = true;
+    public Long getId() {
+        return id;
     }
 
-    public void desativar() {
-        this.ativo = false;
+    public String getNome() {
+        return nome;
     }
 }

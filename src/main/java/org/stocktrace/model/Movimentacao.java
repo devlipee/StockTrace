@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Movimentacao {
 
+    private Long id;
     private Estoque estoque;
     private TipoMovimentacao tipo;
     private int quantidade;
@@ -12,7 +13,15 @@ public class Movimentacao {
     private String observacao;
     private Usuario usuario;
 
-    public Movimentacao(Estoque estoque, TipoMovimentacao tipo, int quantidade, String motivo, String observacao, Usuario usuario) {
+    // Movimentação nova
+    public Movimentacao(
+            Estoque estoque,
+            TipoMovimentacao tipo,
+            int quantidade,
+            String motivo,
+            String observacao,
+            Usuario usuario
+    ) {
         this.estoque = estoque;
         this.tipo = tipo;
         this.quantidade = quantidade;
@@ -22,16 +31,59 @@ public class Movimentacao {
         this.dataHora = LocalDateTime.now();
     }
 
-    public Estoque getEstoque() {return estoque;}
-    public TipoMovimentacao getTipo() {return tipo;}
-    public int getQuantidade() {return quantidade;}
-    public LocalDateTime getDataHora() {return dataHora;}
-    public String getMotivo() {return motivo;}
-    public String getObservacao() {return observacao;}
-    public Usuario getUsuario() {return usuario;}
+    // Movimentação que já veio do banco
+    public Movimentacao(
+            Long id,
+            Estoque estoque,
+            TipoMovimentacao tipo,
+            int quantidade,
+            LocalDateTime dataHora,
+            String motivo,
+            String observacao,
+            Usuario usuario
+    ) {
+        this.id = id;
+        this.estoque = estoque;
+        this.tipo = tipo;
+        this.quantidade = quantidade;
+        this.dataHora = dataHora;
+        this.motivo = motivo;
+        this.observacao = observacao;
+        this.usuario = usuario;
+    }
 
+    public Long getId() {
+        return id;
+    }
 
-    //METODOS
+    public Estoque getEstoque() {
+        return estoque;
+    }
+
+    public TipoMovimentacao getTipo() {
+        return tipo;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public LocalDateTime getDataHora() {
+        return dataHora;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public boolean ehEntrada() {
         return this.tipo == TipoMovimentacao.ENTRADA;
     }
@@ -46,12 +98,7 @@ public class Movimentacao {
                 + this.quantidade
                 + " unidade(s) do produto "
                 + this.estoque.getProduto().getNome()
-                + " na localização "
-                + this.estoque.getLocalizacao().getNome();
+                + " na loja "
+                + this.estoque.getLoja().getNome();
     }
-
-
-
-
-
 }

@@ -5,34 +5,60 @@ import org.stocktrace.exception.QuantidadeInvalidaException;
 
 public class Estoque {
 
+    private Long id;
     private final Produto produto;
-    private final Localizacao localizacao;
+    private final Loja loja;
     private int quantidadeAtual;
 
-    public Estoque(Produto produto, Localizacao localizacao) {
+    // Estoque novo
+    public Estoque(Produto produto, Loja loja) {
         this.produto = produto;
-        this.localizacao = localizacao;
+        this.loja = loja;
         this.quantidadeAtual = 0;
     }
 
-    public Produto getProduto() {return produto;}
-    public Localizacao getLocalizacao() {return localizacao;}
-    public int getQuantidadeAtual() {return quantidadeAtual;}
+    // Estoque que já veio do banco
+    public Estoque(
+            Long id,
+            Produto produto,
+            Loja loja,
+            int quantidadeAtual
+    ) {
+        this.id = id;
+        this.produto = produto;
+        this.loja = loja;
+        this.quantidadeAtual = quantidadeAtual;
+    }
 
-    //METODOS
+    public Long getId() {
+        return id;
+    }
 
-    //Adiciona produto no estoque se a quantidade inserida for maior q zero
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public Loja getLoja() {
+        return loja;
+    }
+
+    public int getQuantidadeAtual() {
+        return quantidadeAtual;
+    }
+
     public void adicionar(int quantidade) {
+
         if (quantidade <= 0) {
             throw new QuantidadeInvalidaException(
                     "A quantidade adicionada deve ser maior que zero."
             );
         }
+
         this.quantidadeAtual += quantidade;
     }
 
-    //Retira produto do estoque se a retirada for maior q zero e verifica se tem estoque suficiente para retirar
     public void retirar(int quantidade) {
+
         if (quantidade <= 0) {
             throw new QuantidadeInvalidaException(
                     "A quantidade retirada deve ser maior que zero."
@@ -44,6 +70,7 @@ public class Estoque {
                     "Quantidade insuficiente em estoque."
             );
         }
+
         this.quantidadeAtual -= quantidade;
     }
 }
