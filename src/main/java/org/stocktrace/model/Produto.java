@@ -11,7 +11,7 @@ public class Produto {
     private BigDecimal preco;
     private String unidadeMedida;
     private boolean ativo;
-    private Categoria categoria;
+    private CategoriaProduto categoria;
 
     // Produto novo
     public Produto(
@@ -20,7 +20,7 @@ public class Produto {
             String descricao,
             BigDecimal preco,
             String unidadeMedida,
-            Categoria categoria
+            CategoriaProduto categoria
     ) {
         this.codigo = codigo;
         this.nome = nome;
@@ -40,7 +40,8 @@ public class Produto {
             BigDecimal preco,
             String unidadeMedida,
             boolean ativo,
-            Categoria categoria
+            CategoriaProduto categoria
+
     ) {
         this.id = id;
         this.codigo = codigo;
@@ -80,7 +81,7 @@ public class Produto {
         return ativo;
     }
 
-    public Categoria getCategoria() {
+    public CategoriaProduto getCategoria() {
         return categoria;
     }
 
@@ -96,7 +97,7 @@ public class Produto {
         this.unidadeMedida = unidadeMedida;
     }
 
-    public void alterarCategoria(Categoria categoria) {
+    public void alterarCategoria( CategoriaProduto categoria) {
         this.categoria = categoria;
     }
 

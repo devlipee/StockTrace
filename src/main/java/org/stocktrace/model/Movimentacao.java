@@ -11,7 +11,8 @@ public class Movimentacao {
     private LocalDateTime dataHora;
     private String motivo;
     private String observacao;
-    private Usuario usuario;
+    private String responsavel;
+   
 
     // Movimentação nova
     public Movimentacao(
@@ -20,14 +21,14 @@ public class Movimentacao {
             int quantidade,
             String motivo,
             String observacao,
-            Usuario usuario
+            String responsavel
     ) {
         this.estoque = estoque;
         this.tipo = tipo;
         this.quantidade = quantidade;
         this.motivo = motivo;
         this.observacao = observacao;
-        this.usuario = usuario;
+        this.responsavel = responsavel;
         this.dataHora = LocalDateTime.now();
     }
 
@@ -40,7 +41,7 @@ public class Movimentacao {
             LocalDateTime dataHora,
             String motivo,
             String observacao,
-            Usuario usuario
+            String responsavel
     ) {
         this.id = id;
         this.estoque = estoque;
@@ -49,7 +50,7 @@ public class Movimentacao {
         this.dataHora = dataHora;
         this.motivo = motivo;
         this.observacao = observacao;
-        this.usuario = usuario;
+        this.responsavel = responsavel;
     }
 
     public Long getId() {
@@ -80,8 +81,8 @@ public class Movimentacao {
         return observacao;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public String getResponsavel() {
+        return responsavel;
     }
 
     public boolean ehEntrada() {
@@ -99,6 +100,8 @@ public class Movimentacao {
                 + " unidade(s) do produto "
                 + this.estoque.getProduto().getNome()
                 + " na loja "
-                + this.estoque.getLoja().getNome();
+                + this.estoque.getLoja().getNome()
+                + " - Responsável: "
+                + this.responsavel;
     }
 }

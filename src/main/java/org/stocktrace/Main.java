@@ -1,45 +1,27 @@
 package org.stocktrace;
 
-import org.stocktrace.model.Categoria;
-import org.stocktrace.repository.CategoriaRepository;
+import org.stocktrace.model.CategoriaProduto;
+import org.stocktrace.model.Produto;
+import org.stocktrace.repository.ProdutoRepository;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        ProdutoRepository produtoRepository = new ProdutoRepository();
+
         try {
 
-            Categoria categoria = new Categoria(
-                    "Bebidas",
-                    "Produtos líquidos"
-            );
+            produtoRepository.deletarProduto(2L);
 
-            CategoriaRepository repository =
-                    new CategoriaRepository();
+            System.out.println("Produto deletado com sucesso!");
 
-            Categoria categoriaCadastrada =
-                    repository.cadastrarCategoria(categoria);
-
-            System.out.println(
-                    "Categoria cadastrada com sucesso!"
-            );
-
-            System.out.println(
-                    "ID gerado: " + categoriaCadastrada.getId()
-            );
-
-            System.out.println(
-                    "Nome: " + categoriaCadastrada.getNome()
-            );
-
-        } catch (SQLException | IOException e) {
-
-            System.out.println(
-                    "Erro ao cadastrar categoria: " + e.getMessage()
-            );
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
         }
+
+
     }
 }
