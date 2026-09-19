@@ -1,4 +1,7 @@
 target/
+src/main/resources/config.properties
+.idea/
+*.iml
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

@@ -1,56 +1,24 @@
 package org.stocktrace;
 
-import org.stocktrace.model.*;
+import org.stocktrace.config.ConexaoBanco;
 
-import java.math.BigDecimal;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Categoria categoria = new Categoria(
-                "Alimentos",
-                "Produtos alimentícios"
-        );
+        try {
+            Connection conexao = ConexaoBanco.conectar();
 
-        Produto arroz = new Produto(
-                "ARR001",
-                "Arroz 5kg",
-                "Arroz branco tipo 1",
-                new BigDecimal("29.90"),
-                "UN",
-                categoria
-        );
+            System.out.println("Conectado com sucesso ao StockTrace!");
 
-        Localizacao deposito = new Localizacao(
-                "Depósito",
-                "Área principal"
-        );
+            conexao.close();
 
-        Usuario usuario = new Usuario(
-                "Samuel",
-                "luiz"
-        );
-
-        Estoque estoque = new Estoque(
-                arroz,
-                deposito
-        );
-
-        estoque.adicionar(50);
-
-        Movimentacao entrada = new Movimentacao(
-                estoque,
-                TipoMovimentacao.ENTRADA,
-                50,
-                "Compra de fornecedor",
-                "Estoque inicial",
-                usuario
-        );
-
-        System.out.println("Produto: " + arroz.getNome());
-        System.out.println("Localização: " + deposito.getNome());
-        System.out.println("Quantidade: " + estoque.getQuantidadeAtual());
-        System.out.println(entrada.getDescricao());
+        } catch (SQLException | IOException e) {
+            System.out.println("Erro ao conectar: " + e.getMessage());
+        }
     }
 }
