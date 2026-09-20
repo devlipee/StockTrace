@@ -10,17 +10,26 @@ import java.util.List;
 
 public class LojaRepository {
 
+
     // Cadastra uma nova loja no banco e retorna a loja com o ID gerado.
-    public Loja cadastrarLoja(Loja loja) throws SQLException, IOException {
+    public Loja cadastrarLoja(Loja loja)
+            throws SQLException, IOException {
+
         String sql = """
-                INSERT INTO loja (nome, cidade, bairro, rua, numero, complemento, cep)
+                INSERT INTO loja
+                (nome, cidade, bairro, rua, numero, complemento, cep)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (
                 Connection conexao = ConexaoBanco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+
+                PreparedStatement stmt = conexao.prepareStatement(
+                        sql,
+                        Statement.RETURN_GENERATED_KEYS
+                )
         ) {
+
             stmt.setString(1, loja.getNome());
             stmt.setString(2, loja.getCidade());
             stmt.setString(3, loja.getBairro());
@@ -32,7 +41,9 @@ public class LojaRepository {
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
+
                 if (rs.next()) {
+
                     return new Loja(
                             rs.getLong(1),
                             loja.getNome(),
@@ -46,23 +57,20 @@ public class LojaRepository {
                 }
             }
 
-            throw new SQLException("Não foi possível obter o ID da loja cadastrada.");
+            throw new SQLException(
+                    "Não foi possível obter o ID da loja cadastrada."
+            );
         }
     }
 
-    /*
-     * o metodo buscar lojas depende de mapearlojas que transformas as linhas da tabela em um objeto loja
-     *
-     * 1. Faz um SELECT na tabela loja.
-     * 2. O banco devolve os dados em um ResultSet.
-     * 3. O while percorre cada linha retornada pelo banco.
-     * 4. Para cada linha, o metodo mapearLoja() transforma os dados em um objeto Loja.
-     * 5. Cada objeto Loja é adicionado na lista.
-     * 6. No final, o metodo retorna a lista com todas as lojas encontradas.
-     */
-    public List<Loja> listarLojas() throws SQLException, IOException {
+
+    // Lista todas as lojas cadastradas no banco.
+    public List<Loja> listarLojas()
+            throws SQLException, IOException {
+
         String sql = """
-                SELECT id, nome, cidade, bairro, rua, numero, complemento, cep
+                SELECT id, nome, cidade, bairro,
+                       rua, numero, complemento, cep
                 FROM loja
                 ORDER BY nome
                 """;
@@ -74,6 +82,7 @@ public class LojaRepository {
                 PreparedStatement stmt = conexao.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()
         ) {
+
             while (rs.next()) {
                 lojas.add(mapearLoja(rs));
             }
@@ -82,11 +91,15 @@ public class LojaRepository {
         return lojas;
     }
 
-    // Atualiza os dados de uma loja já existente usando o ID da loja.
-    public void atualizarLoja(Loja loja) throws SQLException, IOException {
+
+    // Busca uma loja específica pelo ID.
+    public Loja buscarLojaPorId(Long id)
+            throws SQLException, IOException {
+
         String sql = """
-                UPDATE loja
-                SET nome = ?, cidade = ?, bairro = ?, rua = ?, numero = ?, complemento = ?, cep = ?
+                SELECT id, nome, cidade, bairro,
+                       rua, numero, complemento, cep
+                FROM loja
                 WHERE id = ?
                 """;
 
@@ -94,6 +107,47 @@ public class LojaRepository {
                 Connection conexao = ConexaoBanco.conectar();
                 PreparedStatement stmt = conexao.prepareStatement(sql)
         ) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return mapearLoja(rs);
+                }
+            }
+        }
+
+        throw new SQLException(
+                "Loja não encontrada. ID: " + id
+        );
+    }
+
+
+    /*
+     * Atualiza no banco os dados que já estão
+     * dentro do objeto Loja.
+     */
+    public void atualizarLoja(Loja loja)
+            throws SQLException, IOException {
+
+        String sql = """
+                UPDATE loja
+                SET nome = ?,
+                    cidade = ?,
+                    bairro = ?,
+                    rua = ?,
+                    numero = ?,
+                    complemento = ?,
+                    cep = ?
+                WHERE id = ?
+                """;
+
+        try (
+                Connection conexao = ConexaoBanco.conectar();
+                PreparedStatement stmt = conexao.prepareStatement(sql)
+        ) {
+
             stmt.setString(1, loja.getNome());
             stmt.setString(2, loja.getCidade());
             stmt.setString(3, loja.getBairro());
@@ -106,32 +160,48 @@ public class LojaRepository {
             int linhasAlteradas = stmt.executeUpdate();
 
             if (linhasAlteradas == 0) {
-                throw new SQLException("Loja não encontrada. ID: " + loja.getId());
+                throw new SQLException(
+                        "Loja não encontrada. ID: " + loja.getId()
+                );
             }
         }
     }
 
+
     // Exclui uma loja do banco pelo ID informado.
-    public void deletarLoja(Long id) throws SQLException, IOException {
-        String sql = "DELETE FROM loja WHERE id = ?";
+    public void deletarLoja(Long id)
+            throws SQLException, IOException {
+
+        String sql = """
+                DELETE FROM loja
+                WHERE id = ?
+                """;
 
         try (
                 Connection conexao = ConexaoBanco.conectar();
                 PreparedStatement stmt = conexao.prepareStatement(sql)
         ) {
+
             stmt.setLong(1, id);
 
             int linhasDeletadas = stmt.executeUpdate();
 
             if (linhasDeletadas == 0) {
-                throw new SQLException("Loja não encontrada. ID: " + id);
+                throw new SQLException(
+                        "Loja não encontrada. ID: " + id
+                );
             }
         }
     }
 
-    // Converte uma linha retornada pelo banco em um objeto Loja.
-    //Toda vez que um metodo fizer um SELECT de loja, usamos este metodo para transformar a linha do banco, em um objeto Loja
-    private Loja mapearLoja(ResultSet rs) throws SQLException {
+
+    /*
+     * Transforma uma linha retornada pelo banco
+     * em um objeto Loja.
+     */
+    private Loja mapearLoja(ResultSet rs)
+            throws SQLException {
+
         return new Loja(
                 rs.getLong("id"),
                 rs.getString("nome"),

@@ -11,7 +11,8 @@ public class Loja {
     private String complemento;
     private String cep;
 
-    // Loja nova
+
+    // Loja nova, ainda não cadastrada no banco.
     public Loja(
             String nome,
             String cidade,
@@ -30,7 +31,8 @@ public class Loja {
         this.cep = cep;
     }
 
-    // Loja que já veio do banco
+
+    // Loja que já veio do banco.
     public Loja(
             Long id,
             String nome,
@@ -50,6 +52,7 @@ public class Loja {
         this.complemento = complemento;
         this.cep = cep;
     }
+
 
     public Long getId() {
         return id;
@@ -82,6 +85,32 @@ public class Loja {
     public String getCep() {
         return cep;
     }
+
+
+    /*
+     * Atualiza os dados da loja dentro do objeto Java.
+     *
+     * Depois disso, o LojaRepository pode salvar
+     * esses novos valores no banco.
+     */
+    public void atualizarDados(
+            String nome,
+            String cidade,
+            String bairro,
+            String rua,
+            String numero,
+            String complemento,
+            String cep
+    ) {
+        this.nome = nome;
+        this.cidade = cidade;
+        this.bairro = bairro;
+        this.rua = rua;
+        this.numero = numero;
+        this.complemento = complemento;
+        this.cep = cep;
+    }
+
 
     public String getEnderecoCompleto() {
         return rua
