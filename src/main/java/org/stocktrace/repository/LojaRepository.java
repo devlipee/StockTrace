@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.stocktrace.exception.LojaNaoEncontradaException;
 
 public class LojaRepository {
 
@@ -118,9 +119,7 @@ public class LojaRepository {
             }
         }
 
-        throw new SQLException(
-                "Loja não encontrada. ID: " + id
-        );
+        throw new LojaNaoEncontradaException(id);
     }
 
 
@@ -160,10 +159,9 @@ public class LojaRepository {
             int linhasAlteradas = stmt.executeUpdate();
 
             if (linhasAlteradas == 0) {
-                throw new SQLException(
-                        "Loja não encontrada. ID: " + loja.getId()
-                );
+                buscarLojaPorId(loja.getId());
             }
+
         }
     }
 
@@ -187,9 +185,7 @@ public class LojaRepository {
             int linhasDeletadas = stmt.executeUpdate();
 
             if (linhasDeletadas == 0) {
-                throw new SQLException(
-                        "Loja não encontrada. ID: " + id
-                );
+                throw new LojaNaoEncontradaException(id);
             }
         }
     }
