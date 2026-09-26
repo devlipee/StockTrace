@@ -1,7 +1,6 @@
 package org.stocktrace.service;
 
-import org.stocktrace.exception.IdInvalidoException;
-import org.stocktrace.exception.NomeLojaInvalidoException;
+import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.model.Loja;
 import org.stocktrace.repository.LojaRepository;
 
@@ -90,12 +89,12 @@ public class LojaService {
         lojaRepository.deletarLoja(id);
     }
 
-    // Validações reutilizadas pelos métodos deste Service.
+    // Validações privadas reutilizadas pelos métodos deste Service.
 
     private void validarNome(String nome) {
 
         if (nome == null || nome.isBlank()) {
-            throw new NomeLojaInvalidoException(
+            throw new DadosInvalidosException(
                     "O nome da loja é obrigatório."
             );
         }
@@ -104,7 +103,7 @@ public class LojaService {
     private void validarId(Long id) {
 
         if (id == null || id <= 0) {
-            throw new IdInvalidoException(
+            throw new DadosInvalidosException(
                     "O ID da loja deve ser maior que zero."
             );
         }

@@ -1,13 +1,13 @@
 package org.stocktrace.repository;
 
 import org.stocktrace.config.ConexaoBanco;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Loja;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.stocktrace.exception.LojaNaoEncontradaException;
 
 public class LojaRepository {
 
@@ -119,7 +119,7 @@ public class LojaRepository {
             }
         }
 
-        throw new LojaNaoEncontradaException(id);
+        throw new EntidadeNaoEncontradaException ("Loja não encontrada. ID: " + id);
     }
 
 
@@ -185,7 +185,9 @@ public class LojaRepository {
             int linhasDeletadas = stmt.executeUpdate();
 
             if (linhasDeletadas == 0) {
-                throw new LojaNaoEncontradaException(id);
+                throw new EntidadeNaoEncontradaException(
+                        "Loja não encontrada. ID: " + id
+                );
             }
         }
     }

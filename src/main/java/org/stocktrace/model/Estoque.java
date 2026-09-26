@@ -1,7 +1,6 @@
 package org.stocktrace.model;
 
 import org.stocktrace.exception.EstoqueInsuficienteException;
-import org.stocktrace.exception.QuantidadeInvalidaException;
 
 public class Estoque {
 
