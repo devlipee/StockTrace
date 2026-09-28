@@ -1,6 +1,7 @@
 package org.stocktrace.repository;
 
 import org.stocktrace.config.ConexaoBanco;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.CategoriaProduto;
 import org.stocktrace.model.Produto;
 
@@ -118,8 +119,7 @@ public class ProdutoRepository {
                 }
             }
         }
-
-        throw new SQLException("Produto não encontrado. ID: " + id);
+        throw new EntidadeNaoEncontradaException("Produto não encontrado. ID: " + id);
     }
 
     // Busca um produto pelo código informado.
@@ -148,7 +148,7 @@ public class ProdutoRepository {
             }
         }
 
-        throw new SQLException(
+        throw new EntidadeNaoEncontradaException(
                 "Produto não encontrado. Código: " + codigo
         );
     }
@@ -186,9 +186,7 @@ public class ProdutoRepository {
             int linhasAlteradas = stmt.executeUpdate();
 
             if (linhasAlteradas == 0) {
-                throw new SQLException(
-                        "Produto não encontrado. ID: " + produto.getId()
-                );
+                buscarProdutoPorId(produto.getId());
             }
         }
     }
@@ -208,9 +206,28 @@ public class ProdutoRepository {
             int linhasDeletadas = stmt.executeUpdate();
 
             if (linhasDeletadas == 0) {
-                throw new SQLException(
+                throw new EntidadeNaoEncontradaException(
                         "Produto não encontrado. ID: " + id
                 );
+            }
+        }
+    }
+
+    // Verifica se já existe um produto com o código informado.
+    public boolean existeProdutoPorCodigo(String codigo)
+            throws SQLException, IOException {
+
+        String sql = "SELECT 1 FROM produto WHERE codigo = ?";
+
+        try (
+                Connection conexao = ConexaoBanco.conectar();
+                PreparedStatement stmt = conexao.prepareStatement(sql)
+        ) {
+
+            stmt.setString(1, codigo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
             }
         }
     }

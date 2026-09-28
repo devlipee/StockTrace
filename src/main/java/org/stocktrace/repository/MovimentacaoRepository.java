@@ -1,6 +1,7 @@
 package org.stocktrace.repository;
 
 import org.stocktrace.config.ConexaoBanco;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
 import org.stocktrace.model.Movimentacao;
 import org.stocktrace.model.TipoMovimentacao;
@@ -134,7 +135,7 @@ public class MovimentacaoRepository {
             }
         }
 
-        throw new SQLException(
+        throw new EntidadeNaoEncontradaException(
                 "Movimentação não encontrada. ID: " + id
         );
     }

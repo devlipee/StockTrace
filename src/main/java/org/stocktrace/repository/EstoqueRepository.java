@@ -1,6 +1,7 @@
 package org.stocktrace.repository;
 
 import org.stocktrace.config.ConexaoBanco;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
 import org.stocktrace.model.Loja;
 import org.stocktrace.model.Produto;
@@ -85,7 +86,7 @@ public class EstoqueRepository {
             }
         }
 
-        throw new SQLException(
+        throw new EntidadeNaoEncontradaException(
                 "Estoque não encontrado. ID: " + id
         );
     }
@@ -181,9 +182,7 @@ public class EstoqueRepository {
             int linhasAlteradas = stmt.executeUpdate();
 
             if (linhasAlteradas == 0) {
-                throw new SQLException(
-                        "Estoque não encontrado. ID: " + estoque.getId()
-                );
+                buscarEstoquePorId(estoque.getId());
             }
         }
     }

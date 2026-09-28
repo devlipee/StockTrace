@@ -1,5 +1,6 @@
 package org.stocktrace.model;
 
+import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.exception.EstoqueInsuficienteException;
 
 public class Estoque {
@@ -48,7 +49,7 @@ public class Estoque {
     public void adicionar(int quantidade) {
 
         if (quantidade <= 0) {
-            throw new QuantidadeInvalidaException(
+            throw new DadosInvalidosException(
                     "A quantidade adicionada deve ser maior que zero."
             );
         }
@@ -59,7 +60,7 @@ public class Estoque {
     public void retirar(int quantidade) {
 
         if (quantidade <= 0) {
-            throw new QuantidadeInvalidaException(
+            throw new DadosInvalidosException(
                     "A quantidade retirada deve ser maior que zero."
             );
         }
