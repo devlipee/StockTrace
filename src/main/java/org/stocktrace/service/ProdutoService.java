@@ -108,6 +108,44 @@ public class ProdutoService {
         return produto;
     }
 
+    public Produto alterarCategoriaProduto(
+            Long id,
+            CategoriaProduto categoria
+    ) throws SQLException, IOException{
+
+        if (categoria == null){
+            throw new DadosInvalidosException("A categoria do produto é obrigatória");
+        }
+
+        Produto produto = buscarProdutoPorId(id);
+        produto.alterarCategoria(categoria);
+        produtoRepository.atualizarProduto(produto);
+
+        return produto;
+    }
+
+    public Produto ativarProduto(Long id) throws SQLException, IOException{
+        Produto produto = buscarProdutoPorId(id);
+        produto.ativar();
+        produtoRepository.atualizarProduto(produto);
+        return produto;
+
+    }
+
+    public Produto desativarProduto(Long id)throws SQLException, IOException{
+        Produto produto = buscarProdutoPorId(id);
+        produto.desativar();
+        produtoRepository.atualizarProduto(produto);
+        return produto;
+    }
+
+    public void  deletarProduto(Long id)throws SQLException, IOException{
+
+        if (id == null || id <= 0){
+            throw new DadosInvalidosException ("Id informado inválido, ID: "+ id);
+        }
+        produtoRepository.deletarProduto(id);
+    }
 
     // Validação completa dos dados do produto:
 
