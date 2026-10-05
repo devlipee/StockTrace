@@ -20,69 +20,36 @@ public class MovimentacaoRepository {
 
     // Cadastra uma nova movimentação no banco
     // e retorna a movimentação com o ID gerado.
-    public Movimentacao cadastrarMovimentacao(Movimentacao movimentacao)
-            throws SQLException, IOException {
+    public Movimentacao cadastrarMovimentacao(
+            Connection conexao,
+            Movimentacao movimentacao
+    ) throws SQLException {
 
         String sql = """
-                INSERT INTO movimentacao
-                (estoque_id, tipo, quantidade, data_hora, motivo, observacao, responsavel)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO movimentacao
+            (estoque_id, tipo, quantidade, data_hora, motivo, observacao, responsavel)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """;
 
-        try (
-                Connection conexao = ConexaoBanco.conectar();
-
-                PreparedStatement stmt = conexao.prepareStatement(
-                        sql,
-                        Statement.RETURN_GENERATED_KEYS
-                )
-        ) {
-
-            stmt.setLong(
-                    1,
-                    movimentacao.getEstoque().getId()
-            );
-
-            // Converte o enum ENTRADA ou SAIDA para texto.
-            stmt.setString(
-                    2,
-                    movimentacao.getTipo().name()
-            );
-
-            stmt.setInt(
-                    3,
-                    movimentacao.getQuantidade()
-            );
-
-            // Converte LocalDateTime para Timestamp do banco.
+        try (PreparedStatement stmt = conexao.prepareStatement(
+                sql,
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+            stmt.setLong(1, movimentacao.getEstoque().getId());
+            stmt.setString(2, movimentacao.getTipo().name());
+            stmt.setInt(3, movimentacao.getQuantidade());
             stmt.setTimestamp(
                     4,
-                    Timestamp.valueOf(
-                            movimentacao.getDataHora()
-                    )
+                    Timestamp.valueOf(movimentacao.getDataHora())
             );
-
-            stmt.setString(
-                    5,
-                    movimentacao.getMotivo()
-            );
-
-            stmt.setString(
-                    6,
-                    movimentacao.getObservacao()
-            );
-
-            stmt.setString(
-                    7,
-                    movimentacao.getResponsavel()
-            );
+            stmt.setString(5, movimentacao.getMotivo());
+            stmt.setString(6, movimentacao.getObservacao());
+            stmt.setString(7, movimentacao.getResponsavel());
 
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-
                 if (rs.next()) {
-
                     return new Movimentacao(
                             rs.getLong(1),
                             movimentacao.getEstoque(),

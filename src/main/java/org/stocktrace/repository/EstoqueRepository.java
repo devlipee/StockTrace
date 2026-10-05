@@ -91,6 +91,34 @@ public class EstoqueRepository {
         );
     }
 
+    public Estoque buscarEstoquePorIdParaAtualizacao(
+            Connection conexao,
+            Long id
+    ) throws SQLException, IOException {
+
+        String sql = """
+            SELECT id, produto_id, loja_id, quantidade_atual
+            FROM estoque
+            WHERE id = ?
+            FOR UPDATE
+            """;
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapearEstoque(rs);
+                }
+            }
+        }
+
+        throw new EntidadeNaoEncontradaException(
+                "Estoque não encontrado. ID: " + id
+        );
+    }
+
+
 
     /*
      * Busca o estoque de um determinado produto
@@ -162,27 +190,37 @@ public class EstoqueRepository {
 
 
     // Atualiza somente a quantidade atual do estoque.
-    public void atualizarQuantidade(Estoque estoque)
-            throws SQLException, IOException {
+    public void atualizarQuantidade(Connection conexao, Estoque estoque)
+            throws SQLException {
 
         String sql = """
-                UPDATE estoque
-                SET quantidade_atual = ?
-                WHERE id = ?
-                """;
+            UPDATE estoque
+            SET quantidade_atual = ?
+            WHERE id = ?
+            """;
 
-        try (
-                Connection conexao = ConexaoBanco.conectar();
-                PreparedStatement stmt = conexao.prepareStatement(sql)
-        ) {
-
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setInt(1, estoque.getQuantidadeAtual());
             stmt.setLong(2, estoque.getId());
 
             int linhasAlteradas = stmt.executeUpdate();
 
+            // Zero pode significar que a quantidade já tinha esse valor.
+            // Por isso, verificamos se o estoque realmente existe.
             if (linhasAlteradas == 0) {
-                buscarEstoquePorId(estoque.getId());
+                String consulta = "SELECT id FROM estoque WHERE id = ?";
+
+                try (PreparedStatement busca = conexao.prepareStatement(consulta)) {
+                    busca.setLong(1, estoque.getId());
+
+                    try (ResultSet rs = busca.executeQuery()) {
+                        if (!rs.next()) {
+                            throw new EntidadeNaoEncontradaException(
+                                    "Estoque não encontrado. ID: " + estoque.getId()
+                            );
+                        }
+                    }
+                }
             }
         }
     }
@@ -191,15 +229,7 @@ public class EstoqueRepository {
     /*
      * Transforma uma linha da tabela estoque
      * em um objeto Estoque.
-     *
-     * A tabela estoque guarda:
-     *
-     * produto_id
-     * loja_id
-     * quantidade_atual
-     *
-     * Então buscamos o Produto e a Loja pelos seus IDs
-     * e depois montamos o objeto Estoque completo.
+     * montando o objeto Estoque completo.
      */
     private Estoque mapearEstoque(ResultSet rs)
             throws SQLException, IOException {
