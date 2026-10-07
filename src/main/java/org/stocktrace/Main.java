@@ -18,67 +18,106 @@ public class Main {
         MovimentacaoService movimentacaoService = new MovimentacaoService();
 
         try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("TESTE DE ENTRADA DE ESTOQUE");
-            System.out.println("Este teste grava uma entrada real de 5 unidades no banco.");
+            System.out.println("TESTE DE SAÍDA DE ESTOQUE");
+            System.out.println("Este teste retira 65 unidades no banco.");
+
             System.out.print("Informe o ID de um estoque existente: ");
             Long estoqueId = Long.parseLong(scanner.nextLine().trim());
 
             System.out.print("Informe o nome do responsável: ");
             String responsavel = scanner.nextLine();
 
-            Estoque estoqueAntes = estoqueService.buscarEstoquePorId(estoqueId);
-            int saldoAntes = estoqueAntes.getQuantidadeAtual();
-            int historicoAntes = movimentacaoService
-                    .listarMovimentacoesPorEstoque(estoqueId).size();
+            // Consulta os dados antes da saída.
+            Estoque estoqueAntes =
+                    estoqueService.buscarEstoquePorId(estoqueId);
 
-            System.out.println("Produto: " + estoqueAntes.getProduto().getNome());
-            System.out.println("Loja: " + estoqueAntes.getLoja().getNome());
+            int saldoAntes = estoqueAntes.getQuantidadeAtual();
+
+            int historicoAntes = movimentacaoService
+                    .listarMovimentacoesPorEstoque(estoqueId)
+                    .size();
+
+            System.out.println(
+                    "Produto: " + estoqueAntes.getProduto().getNome()
+            );
+            System.out.println(
+                    "Loja: " + estoqueAntes.getLoja().getNome()
+            );
             System.out.println("Saldo antes: " + saldoAntes);
 
-            Movimentacao entrada = movimentacaoService.registrarEntrada(
+            // Registra a saída usando o service.
+            Movimentacao saida = movimentacaoService.registrarSaida(
                     estoqueId,
-                    5,
-                    "Reposição",
+                    65,
+                    "Venda",
                     null,
                     responsavel
             );
 
-            // A entrada já foi confirmada. As consultas abaixo conferem o banco.
-            System.out.println("Entrada gravada. ID: " + entrada.getId());
+            System.out.println("Saída gravada. ID: " + saida.getId());
 
-            Estoque estoqueDepois = estoqueService.buscarEstoquePorId(estoqueId);
-            Movimentacao entradaNoBanco = movimentacaoService
-                    .buscarMovimentacaoPorId(entrada.getId());
+            // Consulta novamente para conferir o que foi salvo.
+            Estoque estoqueDepois =
+                    estoqueService.buscarEstoquePorId(estoqueId);
+
+            Movimentacao saidaNoBanco =
+                    movimentacaoService.buscarMovimentacaoPorId(
+                            saida.getId()
+                    );
+
             int historicoDepois = movimentacaoService
-                    .listarMovimentacoesPorEstoque(estoqueId).size();
+                    .listarMovimentacoesPorEstoque(estoqueId)
+                    .size();
 
-            boolean saldoCorreto = estoqueDepois.getQuantidadeAtual() == (long) saldoAntes + 5;
-            boolean historicoCorreto = historicoDepois == historicoAntes + 1
-                    && entradaNoBanco.getTipo() == TipoMovimentacao.ENTRADA
-                    && entradaNoBanco.getQuantidade() == 5
-                    && entradaNoBanco.getEstoque().getId().equals(estoqueId);
+            boolean saldoCorreto =
+                    estoqueDepois.getQuantidadeAtual() == (long) saldoAntes - 5;
 
-            System.out.println("Saldo depois: " + estoqueDepois.getQuantidadeAtual());
+            boolean historicoCorreto =
+                    historicoDepois == historicoAntes + 1
+                            && saidaNoBanco.getTipo() == TipoMovimentacao.SAIDA
+                            && saidaNoBanco.getQuantidade() == 65
+                            && saidaNoBanco.getEstoque().getId().equals(estoqueId);
+
+            System.out.println(
+                    "Saldo depois: " + estoqueDepois.getQuantidadeAtual()
+            );
             System.out.println("Movimentações antes: " + historicoAntes);
             System.out.println("Movimentações depois: " + historicoDepois);
-            System.out.println("Saldo: " + (saldoCorreto ? "OK" : "DIVERGENTE"));
-            System.out.println("Histórico: " + (historicoCorreto ? "OK" : "DIVERGENTE"));
+
+            System.out.println(
+                    "Saldo: " + (saldoCorreto ? "OK" : "DIVERGENTE")
+            );
+            System.out.println(
+                    "Histórico: " + (historicoCorreto ? "OK" : "DIVERGENTE")
+            );
 
             if (saldoCorreto && historicoCorreto) {
                 System.out.println("TESTE CONCLUÍDO COM SUCESSO.");
             } else {
-                System.out.println("Confira os dados. Execute o teste sem outras movimentações simultâneas.");
+                System.out.println(
+                        "Confira os dados. Execute o teste sem outras "
+                                + "movimentações simultâneas."
+                );
             }
 
         } catch (NumberFormatException erro) {
             System.out.println("Informe um ID numérico válido.");
+
         } catch (StockTraceException erro) {
             System.out.println("Regra de negócio: " + erro.getMessage());
+
         } catch (SQLException | IOException erro) {
-            System.out.println("Não foi possível concluir o teste por um erro de banco ou configuração.");
-            System.out.println("Tipo do erro: " + erro.getClass().getSimpleName());
-            System.out.println("Se a entrada já foi gravada, uma falha na conferência não a desfaz.");
-            System.out.println("Confira o banco antes de executar novamente.");
+            System.out.println(
+                    "Não foi possível concluir o teste por um erro "
+                            + "de banco ou configuração."
+            );
+            System.out.println(
+                    "Tipo do erro: " + erro.getClass().getSimpleName()
+            );
+            System.out.println(
+                    "Se a saída já foi gravada, uma falha na conferência "
+                            + "não a desfaz. Confira o banco antes de repetir."
+            );
         }
     }
 }

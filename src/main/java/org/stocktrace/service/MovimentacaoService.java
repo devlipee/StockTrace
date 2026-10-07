@@ -113,6 +113,70 @@ public class MovimentacaoService {
         }
     }
 
+    public Movimentacao registrarSaida(
+            Long estoqueId,
+            int quantidade,
+            String motivo,
+            String observacao,
+            String responsavel
+    ) throws SQLException, IOException {
+
+        validarDadosMovimentacao(quantidade, motivo, responsavel);
+
+        if (estoqueId == null || estoqueId <= 0) {
+            throw new DadosInvalidosException(
+                    "O ID do estoque é inválido: " + estoqueId
+            );
+        }
+
+        try (Connection conexao = ConexaoBanco.conectar()) {
+            conexao.setAutoCommit(false);
+
+            try {
+                // Busca o saldo e bloqueia o estoque durante a transação.
+                Estoque estoque =
+                        estoqueRepository.buscarEstoquePorIdParaAtualizacao(
+                                conexao,
+                                estoqueId
+                        );
+
+                // O model verifica se há saldo suficiente antes de retirar.
+                estoque.retirar(quantidade);
+
+                Movimentacao movimentacao = new Movimentacao(
+                        estoque,
+                        TipoMovimentacao.SAIDA,
+                        quantidade,
+                        motivo,
+                        observacao,
+                        responsavel
+                );
+
+                // As duas gravações usam a mesma conexão.
+                estoqueRepository.atualizarQuantidade(conexao, estoque);
+
+                Movimentacao movimentacaoSalva =
+                        movimentacaoRepository.cadastrarMovimentacao(
+                                conexao,
+                                movimentacao
+                        );
+
+                conexao.commit();
+
+                return movimentacaoSalva;
+
+            } catch (SQLException | IOException | RuntimeException erro) {
+                try {
+                    conexao.rollback();
+                } catch (SQLException erroRollback) {
+                    erro.addSuppressed(erroRollback);
+                }
+
+                throw erro;
+            }
+        }
+    }
+
 
 
 
