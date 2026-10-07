@@ -1,5 +1,6 @@
 package org.stocktrace.repository;
 
+import org.springframework.stereotype.Repository;
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
@@ -12,10 +13,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Repository
 public class MovimentacaoRepository {
 
-    private final EstoqueRepository estoqueRepository =
-            new EstoqueRepository();
+    private final EstoqueRepository estoqueRepository;
+
+    public MovimentacaoRepository(EstoqueRepository estoqueRepository) {
+        this.estoqueRepository = estoqueRepository;
+    }
 
 
     // Cadastra uma nova movimentação no banco

@@ -1,5 +1,6 @@
 package org.stocktrace.service;
 
+import org.springframework.stereotype.Service;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.model.CategoriaProduto;
 import org.stocktrace.model.Produto;
@@ -10,9 +11,14 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class ProdutoService {
 
-    private final ProdutoRepository produtoRepository = new ProdutoRepository();
+    private final ProdutoRepository produtoRepository;
+
+    public ProdutoService(ProdutoRepository produtoRepository) {
+        this.produtoRepository = produtoRepository;
+    }
 
     public Produto cadastrarProduto(
             String codigo,

@@ -1,5 +1,6 @@
 package org.stocktrace.repository;
 
+import org.springframework.stereotype.Repository;
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.CategoriaProduto;
@@ -10,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class ProdutoRepository {
 
     // Cadastra um novo produto no banco e retorna o produto com o ID gerado.

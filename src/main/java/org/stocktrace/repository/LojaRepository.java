@@ -1,4 +1,5 @@
 package org.stocktrace.repository;
+import org.springframework.stereotype.Repository;
 
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
@@ -9,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class LojaRepository {
 
 

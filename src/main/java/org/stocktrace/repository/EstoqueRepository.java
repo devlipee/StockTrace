@@ -1,5 +1,6 @@
 package org.stocktrace.repository;
 
+import org.springframework.stereotype.Repository;
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
@@ -11,10 +12,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class EstoqueRepository {
 
-    private final ProdutoRepository produtoRepository = new ProdutoRepository();
-    private final LojaRepository lojaRepository = new LojaRepository();
+    private final ProdutoRepository produtoRepository;
+    private final LojaRepository lojaRepository;
+
+    public EstoqueRepository(
+            ProdutoRepository produtoRepository,
+            LojaRepository lojaRepository
+    ) {
+        this.produtoRepository = produtoRepository;
+        this.lojaRepository = lojaRepository;
+    }
 
 
     // Cadastra o estoque de um produto em uma loja

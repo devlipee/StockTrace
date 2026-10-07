@@ -1,5 +1,6 @@
 package org.stocktrace.service;
 
+import org.springframework.stereotype.Service;
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.model.Estoque;
@@ -13,10 +14,21 @@ import java.util.List;
 import java.io.IOException;
 import java.sql.SQLException;
 
+@Service
 public class MovimentacaoService {
-    private final EstoqueRepository estoqueRepository = new EstoqueRepository();
-    private final EstoqueService estoqueService = new EstoqueService();
-    private final MovimentacaoRepository movimentacaoRepository = new MovimentacaoRepository();
+    private final EstoqueRepository estoqueRepository;
+    private final EstoqueService estoqueService;
+    private final MovimentacaoRepository movimentacaoRepository;
+
+    public MovimentacaoService(
+            EstoqueRepository estoqueRepository,
+            EstoqueService estoqueService,
+            MovimentacaoRepository movimentacaoRepository
+    ){
+        this.estoqueRepository = estoqueRepository;
+        this.estoqueService = estoqueService;
+        this.movimentacaoRepository = movimentacaoRepository;
+    }
 
     public List<Movimentacao> listarMovimentacoes()throws SQLException, IOException {
         return movimentacaoRepository.listarMovimentacoes();

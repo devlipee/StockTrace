@@ -290,7 +290,7 @@ O arquivo `config.properties` está no `.gitignore`. Não inclua credenciais rea
 Execute a classe:
 
 ```text
-org.stocktrace.Main
+
 ```
 
 Para começar com um banco vazio:

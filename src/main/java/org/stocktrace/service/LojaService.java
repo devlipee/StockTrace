@@ -1,5 +1,5 @@
 package org.stocktrace.service;
-
+import org.springframework.stereotype.Service;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.model.Loja;
 import org.stocktrace.repository.LojaRepository;
@@ -8,9 +8,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class LojaService {
 
-    private final LojaRepository lojaRepository = new LojaRepository();
+    private final LojaRepository lojaRepository;
+
+
+    public LojaService(LojaRepository lojaRepository) {
+        this.lojaRepository = lojaRepository;
+    }
+
 
     public Loja cadastrarLoja(
             String nome,

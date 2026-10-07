@@ -1,22 +1,34 @@
 package org.stocktrace.service;
 
+import org.springframework.stereotype.Service;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.model.Estoque;
 import org.stocktrace.model.Loja;
 import org.stocktrace.model.Produto;
 import org.stocktrace.repository.EstoqueRepository;
-import org.stocktrace.repository.ProdutoRepository;
-import org.stocktrace.service.ProdutoService;
+
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class EstoqueService {
 
-  private final EstoqueRepository estoqueRepository = new EstoqueRepository();
-  private final ProdutoService produtoService = new ProdutoService();
-  private final LojaService lojaService = new LojaService();
+    private final EstoqueRepository estoqueRepository;
+    private final ProdutoService produtoService;
+    private final LojaService lojaService;
+
+    public EstoqueService(
+            EstoqueRepository estoqueRepository,
+            ProdutoService produtoService,
+            LojaService lojaService
+    ) {
+        this.estoqueRepository = estoqueRepository;
+        this.produtoService = produtoService;
+        this.lojaService = lojaService;
+    }
+
 
 
   public List<Estoque> listarEstoques()throws SQLException, IOException{
