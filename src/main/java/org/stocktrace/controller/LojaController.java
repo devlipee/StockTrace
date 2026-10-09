@@ -1,10 +1,8 @@
 package org.stocktrace.controller;
 
+import org.springframework.web.bind.annotation.*;
 import org.stocktrace.model.Loja;
 import org.stocktrace.service.LojaService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,9 +17,14 @@ public class LojaController {
     public LojaController(LojaService lojaService){ this.lojaService = lojaService;}
 
     @GetMapping
-    public List<Loja> listarLojas()throws SQLException, IOException{
+    public List<Loja> listarLojas(){
         List<Loja> lojas = lojaService.listarLojas();
         return lojas;
+    }
+
+    @GetMapping("/{id}")
+    public Loja buscarLojaPorId(@PathVariable("id") Long id){
+        return lojaService.buscarLojaPorId(id);
     }
 
 

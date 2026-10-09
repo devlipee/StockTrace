@@ -1,6 +1,7 @@
 package org.stocktrace.repository;
 import org.springframework.stereotype.Repository;
 
+
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Loja;

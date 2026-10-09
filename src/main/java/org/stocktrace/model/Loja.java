@@ -1,7 +1,17 @@
 package org.stocktrace.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
+@Entity
+@Table (name = "loja")
 public class Loja {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String cidade;
@@ -11,6 +21,8 @@ public class Loja {
     private String complemento;
     private String cep;
 
+    protected Loja() {
+    }
 
     // Loja nova, ainda não cadastrada no banco.
     public Loja(
