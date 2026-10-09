@@ -1,17 +1,41 @@
 package org.stocktrace.model;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
+@Entity
+@Table (name = "produto")
 public class Produto {
 
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(length = 50)
     private String codigo;
+
+    @Column(length = 100)
     private String nome;
+
+    @Column(length = 255)
     private String descricao;
+
+    @Column(precision = 10, scale = 2)
     private BigDecimal preco;
+
+    @Column(name = "unidade_medida", length = 20)
     private String unidadeMedida;
+
     private boolean ativo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
     private CategoriaProduto categoria;
+
+    protected Produto() {
+    }
+
 
     // Produto novo
     public Produto(

@@ -1,23 +1,26 @@
 package org.stocktrace.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.stocktrace.exception.DadosInvalidosException;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.CategoriaProduto;
 import org.stocktrace.model.Produto;
-import org.stocktrace.repository.ProdutoRepository;
+import org.stocktrace.repository.ProdutoJpaRepository;
 
-import java.io.IOException;
+
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
 public class ProdutoService {
 
-    private final ProdutoRepository produtoRepository;
+    private final ProdutoJpaRepository produtoJpaRepository;
 
-    public ProdutoService(ProdutoRepository produtoRepository) {
-        this.produtoRepository = produtoRepository;
+
+    public ProdutoService(ProdutoJpaRepository produtoJpaRepository) {
+        this.produtoJpaRepository = produtoJpaRepository;
+
     }
 
     public Produto cadastrarProduto(
@@ -27,8 +30,7 @@ public class ProdutoService {
             BigDecimal preco,
             String unidadeMedida,
             CategoriaProduto categoria
-    ) throws SQLException, IOException {
-
+    ) {
         //metodo que valida toda entrada de dados do produto
        validarDadosProduto(
                codigo,
@@ -39,12 +41,11 @@ public class ProdutoService {
                categoria);
 
         // Consulta se o código já está cadastrado.
-        if (produtoRepository.existeProdutoPorCodigo(codigo)) {
+        if (produtoJpaRepository.existsByCodigo(codigo)) {
             throw new DadosInvalidosException(
                     "Já existe um produto cadastrado com esse código."
             );
         }
-
         Produto produto = new Produto(
                 codigo,
                 nome,
@@ -53,40 +54,44 @@ public class ProdutoService {
                 unidadeMedida,
                 categoria
         );
-        return  produtoRepository.cadastrarProduto(produto);
+        return  produtoJpaRepository.save(produto);
     }
 
-    public List<Produto> listaProdutos() throws SQLException, IOException{
-        return produtoRepository.listarProdutos();
+    public List<Produto> listaProdutos(){
+        return produtoJpaRepository.findAll();
     }
 
-    public Produto buscarProdutoPorId(Long id) throws SQLException,IOException{
+    public Produto buscarProdutoPorId(Long id){
 
         if (id == null || id <= 0) {
             throw new DadosInvalidosException(
                     "O ID informado é inválido: " + id
             );
         }
-        return produtoRepository.buscarProdutoPorId(id);
+        return produtoJpaRepository.findById(id).orElseThrow(()-> new EntidadeNaoEncontradaException(
+                "Produto não encontrado. ID: "+ id
+        ));
     }
 
-    public Produto buscarProdutoPorCodigo(String codigo) throws SQLException, IOException{
+    public Produto buscarProdutoPorCodigo(String codigo){
         if (codigo == null || codigo.isBlank()){
             throw new DadosInvalidosException(
                     "O código do produto é obrigatório."
             );
         }
-        return produtoRepository.buscarProdutoPorCodigo(codigo);
+        return produtoJpaRepository.findByCodigo(codigo).orElseThrow(()-> new EntidadeNaoEncontradaException(
+                "Produto não encontrado. Código: " + codigo
+        ));
     }
 
+    @Transactional
     public Produto atualizarProduto(
             Long id,
             String nome,
             String descricao,
             BigDecimal preco,
             String unidadeMedida
-    ) throws SQLException, IOException {
-
+    ) {
         // Busca o produto e reaproveita a validação do ID.
         Produto produto = buscarProdutoPorId(id);
 
@@ -109,15 +114,14 @@ public class ProdutoService {
         );
 
         // Persiste as alterações no banco.
-        produtoRepository.atualizarProduto(produto);
-
-        return produto;
+       return produtoJpaRepository.save(produto);
     }
 
+    @Transactional
     public Produto alterarCategoriaProduto(
             Long id,
             CategoriaProduto categoria
-    ) throws SQLException, IOException{
+    ) {
 
         if (categoria == null){
             throw new DadosInvalidosException("A categoria do produto é obrigatória");
@@ -125,32 +129,29 @@ public class ProdutoService {
 
         Produto produto = buscarProdutoPorId(id);
         produto.alterarCategoria(categoria);
-        produtoRepository.atualizarProduto(produto);
+        return produtoJpaRepository.save(produto);
 
-        return produto;
     }
 
-    public Produto ativarProduto(Long id) throws SQLException, IOException{
+    @Transactional
+    public Produto ativarProduto(Long id){
         Produto produto = buscarProdutoPorId(id);
         produto.ativar();
-        produtoRepository.atualizarProduto(produto);
-        return produto;
+        return produtoJpaRepository.save(produto);
 
     }
 
-    public Produto desativarProduto(Long id)throws SQLException, IOException{
+    @Transactional
+    public Produto desativarProduto(Long id){
         Produto produto = buscarProdutoPorId(id);
         produto.desativar();
-        produtoRepository.atualizarProduto(produto);
-        return produto;
+         return produtoJpaRepository.save(produto);
     }
 
-    public void  deletarProduto(Long id)throws SQLException, IOException{
-
-        if (id == null || id <= 0){
-            throw new DadosInvalidosException ("Id informado inválido, ID: "+ id);
-        }
-        produtoRepository.deletarProduto(id);
+    @Transactional
+    public void  deletarProduto(Long id){
+        Produto produto = buscarProdutoPorId(id);
+        produtoJpaRepository.delete(produto);
     }
 
     // Validação completa dos dados do produto:
