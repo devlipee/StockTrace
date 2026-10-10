@@ -11,5 +11,6 @@ public interface ProdutoJpaRepository extends JpaRepository<Produto,Long > {
     Optional<Produto> findByCodigo(String codigo);
 
     //verfica se o produto existe e retorna true ou false
-    Boolean existsByCodigo(String codigo) ;
+    boolean existsByCodigo(String codigo);
+
 }
