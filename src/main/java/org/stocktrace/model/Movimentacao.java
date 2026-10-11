@@ -1,18 +1,37 @@
 package org.stocktrace.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "movimentacao")
 public class Movimentacao {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "estoque_id", nullable = false)
     private Estoque estoque;
+
+    @Enumerated(EnumType.STRING)
     private TipoMovimentacao tipo;
+
     private int quantidade;
+
+    @Column(name = "data_hora")
     private LocalDateTime dataHora;
+
     private String motivo;
     private String observacao;
     private String responsavel;
-   
+
+    protected Movimentacao() {
+    }
+
 
     // Movimentação nova
     public Movimentacao(
@@ -93,6 +112,7 @@ public class Movimentacao {
         return this.tipo == TipoMovimentacao.SAIDA;
     }
 
+    @JsonIgnore
     public String getDescricao() {
         return this.tipo
                 + " de "

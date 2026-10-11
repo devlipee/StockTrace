@@ -1,13 +1,15 @@
 package org.stocktrace.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.DadosInvalidosException;
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
 import org.stocktrace.model.Movimentacao;
 import org.stocktrace.model.TipoMovimentacao;
-import org.stocktrace.repository.EstoqueRepository;
-import org.stocktrace.repository.MovimentacaoRepository;
+import org.stocktrace.repository.EstoqueJpaRepository;
+import org.stocktrace.repository.MovimentacaoJpaRepository;
 
 import java.sql.Connection;
 import java.util.List;
@@ -16,48 +18,50 @@ import java.sql.SQLException;
 
 @Service
 public class MovimentacaoService {
-    private final EstoqueRepository estoqueRepository;
+
+    private final EstoqueJpaRepository estoqueJpaRepository;
     private final EstoqueService estoqueService;
-    private final MovimentacaoRepository movimentacaoRepository;
+    private final MovimentacaoJpaRepository movimentacaoJpaRepository;
 
     public MovimentacaoService(
-            EstoqueRepository estoqueRepository,
+            EstoqueJpaRepository estoqueJpaRepository,
             EstoqueService estoqueService,
-            MovimentacaoRepository movimentacaoRepository
+            MovimentacaoJpaRepository movimentacaoJpaRepository
     ){
-        this.estoqueRepository = estoqueRepository;
+        this.estoqueJpaRepository = estoqueJpaRepository;
         this.estoqueService = estoqueService;
-        this.movimentacaoRepository = movimentacaoRepository;
+        this.movimentacaoJpaRepository = movimentacaoJpaRepository;
     }
 
-    public List<Movimentacao> listarMovimentacoes()throws SQLException, IOException {
-        return movimentacaoRepository.listarMovimentacoes();
+    public List listarMovimentacoes(){
+        return movimentacaoJpaRepository.findAll();
     }
 
-    public Movimentacao buscarMovimentacaoPorId(Long id) throws SQLException, IOException{
+    public Movimentacao buscarMovimentacaoPorId(Long id){
         if (id == null || id<= 0){
             throw new DadosInvalidosException("Id informado inválido, ID: " + id);
         }
 
-        return movimentacaoRepository.buscarMovimentacaoPorId(id);
+        return movimentacaoJpaRepository.findById(id).orElseThrow(()-> new EntidadeNaoEncontradaException(
+                "Movimentação não encontrada. ID: "+id
+        ));
     }
 
-    public List<Movimentacao> listarMovimentacoesPorEstoque(Long estoqueId)
-            throws SQLException, IOException {
+    public List<Movimentacao> listarMovimentacoesPorEstoque(Long estoqueId) {
 
         estoqueService.buscarEstoquePorId(estoqueId);
 
-        return movimentacaoRepository.listarMovimentacoesPorEstoque(estoqueId);
+        return movimentacaoJpaRepository.findByEstoque_Id(estoqueId)  ;
     }
 
+    @Transactional
     public Movimentacao registrarEntrada(
             Long estoqueId,
             int quantidade,
             String motivo,
             String observacao,
             String responsavel
-    ) throws SQLException, IOException {
-
+    ) {
         validarDadosMovimentacao(quantidade, motivo, responsavel);
 
         if (estoqueId == null || estoqueId <= 0) {
@@ -65,74 +69,43 @@ public class MovimentacaoService {
                     "O ID do estoque é inválido: " + estoqueId
             );
         }
+        // Carrega o estoque com lock pessimista (SELECT ... FOR UPDATE).
+        Estoque estoque = estoqueJpaRepository.buscarPorIdParaAtualizacao(estoqueId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(
+                        "Estoque não encontrado. ID: " + estoqueId
+                ));
 
-        try (Connection conexao = ConexaoBanco.conectar()) {
-            conexao.setAutoCommit(false);
-
-            try {
-                // Busca o estoque e mantém a linha bloqueada na transação.
-                Estoque estoque = estoqueRepository.buscarEstoquePorIdParaAtualizacao(
-                                conexao,
-                                estoqueId
-                        );
-
-                // Evita ultrapassar o limite de quantidade do tipo int.
-                if ((long) estoque.getQuantidadeAtual() + quantidade
-                        > Integer.MAX_VALUE) {
-                    throw new DadosInvalidosException(
-                            "A entrada ultrapassa a quantidade máxima suportada."
-                    );
-                }
-
-                // Atualiza a quantidade apenas no objeto Java.
-                estoque.adicionar(quantidade);
-
-                // Cria o registro que explica a alteração do estoque.
-                Movimentacao movimentacao = new Movimentacao(
-                        estoque,
-                        TipoMovimentacao.ENTRADA,
-                        quantidade,
-                        motivo,
-                        observacao,
-                        responsavel
-                );
-
-                // Salva o saldo usando a conexão da transação.
-                estoqueRepository.atualizarQuantidade(conexao, estoque);
-
-                // Salva o histórico usando a mesma conexão.
-                Movimentacao movimentacaoSalva =
-                        movimentacaoRepository.cadastrarMovimentacao(
-                                conexao,
-                                movimentacao
-                        );
-
-                // Confirma as duas gravações juntas.
-                conexao.commit();
-
-                return movimentacaoSalva;
-
-            } catch (SQLException | IOException | RuntimeException erro) {
-                try {
-                    // Desfaz as alterações ainda não confirmadas no banco.
-                    conexao.rollback();
-                } catch (SQLException erroRollback) {
-                    erro.addSuppressed(erroRollback);
-                }
-
-                throw erro;
-            }
+        // Evita ultrapassar o limite de quantidade do tipo int.
+        if ((long) estoque.getQuantidadeAtual() + quantidade > Integer.MAX_VALUE) {
+            throw new DadosInvalidosException(
+                    "A entrada ultrapassa a quantidade máxima suportada."
+            );
         }
+
+        // Entidade gerenciada: o Hibernate grava o novo saldo no commit.
+        estoque.adicionar(quantidade);
+
+        Movimentacao movimentacao = new Movimentacao(
+                estoque,
+                TipoMovimentacao.ENTRADA,
+                quantidade,
+                motivo,
+                observacao,
+                responsavel
+        );
+
+        return movimentacaoJpaRepository.save(movimentacao);
     }
 
+
+    @Transactional
     public Movimentacao registrarSaida(
             Long estoqueId,
             int quantidade,
             String motivo,
             String observacao,
             String responsavel
-    ) throws SQLException, IOException {
-
+    ) {
         validarDadosMovimentacao(quantidade, motivo, responsavel);
 
         if (estoqueId == null || estoqueId <= 0) {
@@ -141,56 +114,27 @@ public class MovimentacaoService {
             );
         }
 
-        try (Connection conexao = ConexaoBanco.conectar()) {
-            conexao.setAutoCommit(false);
+        // Carrega o estoque com lock pessimista (SELECT ... FOR UPDATE).
+        Estoque estoque = estoqueJpaRepository.buscarPorIdParaAtualizacao(estoqueId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(
+                        "Estoque não encontrado. ID: " + estoqueId
+                ));
 
-            try {
-                // Busca o saldo e bloqueia o estoque durante a transação.
-                Estoque estoque =
-                        estoqueRepository.buscarEstoquePorIdParaAtualizacao(
-                                conexao,
-                                estoqueId
-                        );
+        // O model verifica se há saldo suficiente antes de retirar.
+        estoque.retirar(quantidade);
 
-                // O model verifica se há saldo suficiente antes de retirar.
-                estoque.retirar(quantidade);
+        Movimentacao movimentacao = new Movimentacao(
+                estoque,
+                TipoMovimentacao.SAIDA,
+                quantidade,
+                motivo,
+                observacao,
+                responsavel
+        );
 
-                Movimentacao movimentacao = new Movimentacao(
-                        estoque,
-                        TipoMovimentacao.SAIDA,
-                        quantidade,
-                        motivo,
-                        observacao,
-                        responsavel
-                );
-
-                // As duas gravações usam a mesma conexão.
-                estoqueRepository.atualizarQuantidade(conexao, estoque);
-
-                Movimentacao movimentacaoSalva =
-                        movimentacaoRepository.cadastrarMovimentacao(
-                                conexao,
-                                movimentacao
-                        );
-
-                conexao.commit();
-
-                return movimentacaoSalva;
-
-            } catch (SQLException | IOException | RuntimeException erro) {
-                try {
-                    conexao.rollback();
-                } catch (SQLException erroRollback) {
-                    erro.addSuppressed(erroRollback);
-                }
-
-                throw erro;
-            }
-        }
+        // Entidade gerenciada: o Hibernate grava o novo saldo no commit.
+        return movimentacaoJpaRepository.save(movimentacao);
     }
-
-
-
 
 
 
