@@ -2,7 +2,6 @@ package org.stocktrace.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.stocktrace.config.ConexaoBanco;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Estoque;
@@ -10,11 +9,8 @@ import org.stocktrace.model.Movimentacao;
 import org.stocktrace.model.TipoMovimentacao;
 import org.stocktrace.repository.EstoqueJpaRepository;
 import org.stocktrace.repository.MovimentacaoJpaRepository;
-
-import java.sql.Connection;
 import java.util.List;
-import java.io.IOException;
-import java.sql.SQLException;
+
 
 @Service
 public class MovimentacaoService {
@@ -33,7 +29,7 @@ public class MovimentacaoService {
         this.movimentacaoJpaRepository = movimentacaoJpaRepository;
     }
 
-    public List listarMovimentacoes(){
+    public List<Movimentacao> listarMovimentacoes() {
         return movimentacaoJpaRepository.findAll();
     }
 
