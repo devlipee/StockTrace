@@ -1,14 +1,30 @@
 package org.stocktrace.model;
 
+import jakarta.persistence.*;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.exception.EstoqueInsuficienteException;
 
+@Entity
+@Table(name = "estoque")
 public class Estoque {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private final Produto produto;
-    private final Loja loja;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "produto_id", nullable = false)
+    private Produto produto;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "loja_id", nullable = false)
+    private Loja loja;
+
+    @Column(name = "quantidade_atual")
     private int quantidadeAtual;
+
+    protected Estoque() {
+    }
 
     // Estoque novo
     public Estoque(Produto produto, Loja loja) {
