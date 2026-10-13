@@ -122,3 +122,19 @@ CREATE TABLE IF NOT EXISTS movimentacao
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS usuario
+(
+    id         BIGINT       NOT NULL AUTO_INCREMENT,
+    nome       VARCHAR(150) NOT NULL,
+    email      VARCHAR(254) NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    ativo      BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    PRIMARY KEY (id),
+
+    CONSTRAINT uq_usuario_email
+        UNIQUE (email)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
