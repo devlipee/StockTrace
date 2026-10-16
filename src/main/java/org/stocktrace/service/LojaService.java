@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.stocktrace.exception.DadosInvalidosException;
 import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Loja;
+import org.stocktrace.model.Usuario;
 import org.stocktrace.repository.LojaJpaRepository;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class LojaService {
         this.lojaJpaRepository = lojaJpaRepository;
     }
 
-
     public Loja cadastrarLoja(
+            Usuario usuario,
             String nome,
             String cidade,
             String bairro,
@@ -27,10 +28,11 @@ public class LojaService {
             String numero,
             String complemento,
             String cep
-    ){
-        validarDadosLoja(nome,cidade,bairro,rua,numero,cep);
+    ) {
+        validarDadosLoja(nome, cidade, bairro, rua, numero, cep);
 
         Loja loja = new Loja(
+                usuario,
                 nome,
                 cidade,
                 bairro,
@@ -39,6 +41,7 @@ public class LojaService {
                 complemento,
                 cep
         );
+
         return lojaJpaRepository.save(loja);
     }
 

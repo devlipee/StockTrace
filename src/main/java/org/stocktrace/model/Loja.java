@@ -1,10 +1,7 @@
 package org.stocktrace.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 @Entity
 @Table (name = "loja")
@@ -13,6 +10,12 @@ public class Loja {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
+    private Usuario usuario;
+
     private String nome;
     private String cidade;
     private String bairro;
@@ -26,6 +29,7 @@ public class Loja {
 
     // Loja nova, ainda não cadastrada no banco.
     public Loja(
+            Usuario usuario,
             String nome,
             String cidade,
             String bairro,
@@ -34,6 +38,7 @@ public class Loja {
             String complemento,
             String cep
     ) {
+        this.usuario = usuario;
         this.nome = nome;
         this.cidade = cidade;
         this.bairro = bairro;
@@ -43,27 +48,6 @@ public class Loja {
         this.cep = cep;
     }
 
-
-    // Loja que já veio do banco.
-    public Loja(
-            Long id,
-            String nome,
-            String cidade,
-            String bairro,
-            String rua,
-            String numero,
-            String complemento,
-            String cep
-    ) {
-        this.id = id;
-        this.nome = nome;
-        this.cidade = cidade;
-        this.bairro = bairro;
-        this.rua = rua;
-        this.numero = numero;
-        this.complemento = complemento;
-        this.cep = cep;
-    }
 
 
     public Long getId() {
@@ -97,6 +81,8 @@ public class Loja {
     public String getCep() {
         return cep;
     }
+
+    public Usuario getUsuario() {return usuario;}
 
 
     /*
