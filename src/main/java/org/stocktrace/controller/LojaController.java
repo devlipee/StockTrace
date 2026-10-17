@@ -4,10 +4,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stocktrace.dto.LojaDTO;
 import org.stocktrace.model.Loja;
+import org.stocktrace.model.Usuario;
 import org.stocktrace.service.LojaService;
+import org.stocktrace.service.UsuarioService;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -16,8 +19,15 @@ import java.util.List;
 public class LojaController {
 
     private final LojaService lojaService;
+    private final UsuarioService usuarioService;
 
-    public LojaController(LojaService lojaService){ this.lojaService = lojaService;}
+    public LojaController(
+            LojaService lojaService,
+            UsuarioService usuarioService
+    ) {
+        this.lojaService = lojaService;
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public List<Loja> listarLojas(){
@@ -31,9 +41,16 @@ public class LojaController {
     }
 
     @PostMapping
-    public ResponseEntity<Loja> cadastrarLoja(@RequestBody LojaDTO dados) {
+    public ResponseEntity<Loja> cadastrarLoja(
+            @RequestBody LojaDTO dados,
+            Principal principal
+    ) {
+        Usuario usuario = usuarioService.buscarUsuarioPorEmail(
+                principal.getName()
+        );
 
         Loja loja = lojaService.cadastrarLoja(
+                usuario,
                 dados.nome(),
                 dados.cidade(),
                 dados.bairro(),

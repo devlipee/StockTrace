@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.stocktrace.dto.UsuarioRespostaDTO;
 import org.stocktrace.exception.DadosInvalidosException;
 
+import org.stocktrace.exception.EntidadeNaoEncontradaException;
 import org.stocktrace.model.Usuario;
 import org.stocktrace.repository.UsuarioJpaRepository;
 
@@ -48,6 +49,13 @@ public class UsuarioService {
                 usuarioSalvo.getEmail(),
                 usuarioSalvo.isAtivo()
         );
+    }
+
+    public Usuario buscarUsuarioPorEmail(String email) {
+        return usuarioJpaRepository.findByEmail(email)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(
+                        "Usuário não encontrado."
+                ));
     }
 
 
